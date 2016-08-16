@@ -48,7 +48,7 @@ if __name__ == '__main__':
         ax = fig.add_subplot(2, 5, i+1)
         ax.imshow(image.reshape(28, 28))
     for i, reconstruct_image in enumerate(reconstruct_images):
-        ax = fig.add_subplot(2, 5, 5+i)
+        ax = fig.add_subplot(2, 5, 6+i)
         ax.imshow(reconstruct_image.reshape(28, 28))
     plt.savefig("./images/reconstruct_image_{}.png".format(rotation))
 
