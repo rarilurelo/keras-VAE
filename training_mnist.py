@@ -12,6 +12,8 @@ import cv2
 flags = tf.app.flags
 FLAGS = flags.FLAGS
 flags.DEFINE_boolean('rotation', True, 'use rotate dataset?')
+rotation = 'rot' if FLAGS.rotation else 'normal'
+print "start {}".format(rotation)
 
 y_dim = 11 if FLAGS.rotation else 10
 nb_epoch = 5
@@ -47,19 +49,20 @@ def get_rotation():
 
 def get_data():
     if FLAGS.rotation:
-        if os.path.exists('rotation.npz'):
-            data = np.load('rotation.npz')
+        if os.path.exists('./data/rotation.npz'):
+            data = np.load('./data/rotation.npz')
             X_data = data['x']
             y_data = data['y']
         else:
             X_data, y_data = get_rotation()
-            np.savez('rotation.npz', x=X_data, y=y_data)
+            np.savez('./data/rotation.npz', x=X_data, y=y_data)
     else:
         mnist = fetch_mldata('MNIST original')
         X_data, y_data = mnist.data, mnist.target.astype(np.int32)
         X_data = X_data/255.0
         y_data = np.eye(np.max(y_data)+1)[y_data]
     return X_data, y_data
+
 
 if __name__ == '__main__':
     X_data, y_data = get_data()
@@ -76,27 +79,12 @@ if __name__ == '__main__':
                         batch_size=batch_size,
                         validation_data=([X_test, y_test], X_test))
 
-    encoder = Model(input=[vaem1m2.x, vaem1m2.y], output=vaem1m2.z)
-    encoder_json = encoder.to_json(encoding='utf-8')
-    open("encoder_{}.json".format('rot' if FLAGS.rotation else 'normal'), 'w').write(encoder_json)
-    encoder.save_weights("encoder_{}.h5".format('rot' if FLAGS.rotation else 'normal'))
+    # encode to mean deterministic
+    encoder = Model(input=[vaem1m2.x, vaem1m2.y], output=vaem1m2.mean)
+    encoder.save("./trained_model/encoder_{}.h5".format(rotation))
 
     decoder_input = Input((vaem1m2.z_dim, ))
     decoder_output = vaem1m2.decoder([vaem1m2.y, decoder_input])
     decoder = Model(input=[vaem1m2.y, decoder_input], output=decoder_output)
-    decoder_json = decoder.to_json(encoding='utf-8')
-    open("decoder_{}.json".format('rot' if FLAGS.rotation else 'normal'), 'w').write(decoder_json)
-    decoder.save_weights("decoder_{}.h5".format('rot' if FLAGS.rotation else 'normal'))
-
-
-
-
-
-
-
-
-
-
-
-
+    decoder.save("./trained_model/decoder_{}.h5".format(rotation))
 

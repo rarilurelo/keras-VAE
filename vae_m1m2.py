@@ -2,7 +2,7 @@
 from __future__ import division
 from keras.models import Sequential
 from keras.layers import Dense, Activation, Merge, Input
-from custom_batchnormalization import BatchNormalization
+from custom_batchnormalization import CustomBatchNormalization
 from keras import backend as K
 from keras import objectives
 
@@ -43,10 +43,10 @@ class VAEM1M2(object):
     def q_y_x(self):
         q = Sequential()
         q.add(Dense(self.hid_dim, input_dim=self.in_dim))
-        q.add(BatchNormalization())
+        q.add(CustomBatchNormalization())
         q.add(Activation('relu'))
         q.add(Dense(self.hid_dim))
-        q.add(BatchNormalization())
+        q.add(CustomBatchNormalization())
         q.add(Activation('relu'))
 
         q.add(Dense(self.y_dim))
@@ -59,27 +59,27 @@ class VAEM1M2(object):
         """
         x_branch = Sequential()
         x_branch.add(Dense(self.hid_dim, input_dim=self.in_dim))
-        x_branch.add(BatchNormalization())
+        x_branch.add(CustomBatchNormalization())
         x_branch.add(Activation('relu'))
 
         y_branch = Sequential()
         y_branch.add(Dense(self.hid_dim, input_dim=self.y_dim))
-        y_branch.add(BatchNormalization())
+        y_branch.add(CustomBatchNormalization())
         y_branch.add(Activation('relu'))
 
         merged = Sequential([Merge([x_branch, y_branch], mode='concat')])
         merged.add(Dense(self.hid_dim))
-        merged.add(BatchNormalization())
+        merged.add(CustomBatchNormalization())
         merged.add(Activation('relu'))
 
         z_mean = Sequential([merged])
         z_mean.add(Dense(self.z_dim))
-        z_mean.add(BatchNormalization())
+        z_mean.add(CustomBatchNormalization())
         z_mean.add(Activation('relu'))
 
         z_var = Sequential([merged])
         z_var.add(Dense(self.z_dim))
-        z_var.add(BatchNormalization())
+        z_var.add(CustomBatchNormalization())
         z_var.add(Activation('softmax'))
 
 
@@ -91,17 +91,17 @@ class VAEM1M2(object):
         """
         y_branch = Sequential()
         y_branch.add(Dense(self.hid_dim, input_dim=self.y_dim))
-        y_branch.add(BatchNormalization())
+        y_branch.add(CustomBatchNormalization())
         y_branch.add(Activation('relu'))
 
         z_branch = Sequential()
         z_branch.add(Dense(self.hid_dim, input_dim=self.z_dim))
-        z_branch.add(BatchNormalization())
+        z_branch.add(CustomBatchNormalization())
         z_branch.add(Activation('relu'))
 
         merged = Sequential([Merge([y_branch, z_branch], mode='concat')])
         merged.add(Dense(self.hid_dim))
-        merged.add(BatchNormalization())
+        merged.add(CustomBatchNormalization())
         merged.add(Activation('relu'))
 
         pi = Sequential([merged])
