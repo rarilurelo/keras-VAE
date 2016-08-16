@@ -14,8 +14,9 @@ FLAGS = flags.FLAGS
 flags.DEFINE_boolean('rotation', True, 'use rotate dataset?')
 
 y_dim = 11 if FLAGS.rotation else 10
+nb_epoch = 5
 batch_size = 100
-
+alpha = 10
 
 def get_rotation():
     
@@ -64,15 +65,15 @@ if __name__ == '__main__':
     X_data, y_data = get_data()
     X_train, X_test, y_train, y_test = train_test_split(X_data, y_data, test_size=0.2)
 
-    vaem1m2 = VAEM1M2(y_dim=y_dim)
+    vaem1m2 = VAEM1M2(y_dim=y_dim, alpha=alpha)
     traininigModel = Model(input=[vaem1m2.x, vaem1m2.y], output=vaem1m2.x_reconstruct)
     traininigModel.compile(optimizer='adam', loss=vaem1m2.loss_function)
 
 
     traininigModel.fit([X_train, y_train], X_train,
                         shuffle=True,
-                        nb_epoch=1,
-                        batch_size=100,
+                        nb_epoch=nb_epoch,
+                        batch_size=batch_size,
                         validation_data=([X_test, y_test], X_test))
 
     encoder = Model(input=[vaem1m2.x, vaem1m2.y], output=vaem1m2.z)
