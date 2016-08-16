@@ -10,7 +10,7 @@ class VAEM1M2(object):
     """
     VAE model M1+M2. This model can train only by supervised data.
     """
-    def __init__(self, in_dim=784, hid_dim=300, z_dim=20, y_dim=10, batch_size=100, alpha=10):
+    def __init__(self, in_dim=784, hid_dim=300, z_dim=50, y_dim=10, batch_size=100, alpha=10):
         self.in_dim = in_dim
         self.hid_dim = hid_dim
         self.z_dim = z_dim
@@ -61,9 +61,15 @@ class VAEM1M2(object):
         x_branch.add(Dense(self.hid_dim, input_dim=self.in_dim))
         x_branch.add(CustomBatchNormalization())
         x_branch.add(Activation('relu'))
+        x_branch.add(Dense(self.hid_dim))
+        x_branch.add(CustomBatchNormalization())
+        x_branch.add(Activation('relu'))
 
         y_branch = Sequential()
         y_branch.add(Dense(self.hid_dim, input_dim=self.y_dim))
+        y_branch.add(CustomBatchNormalization())
+        y_branch.add(Activation('relu'))
+        y_branch.add(Dense(self.hid_dim))
         y_branch.add(CustomBatchNormalization())
         y_branch.add(Activation('relu'))
 
@@ -71,16 +77,23 @@ class VAEM1M2(object):
         merged.add(Dense(self.hid_dim))
         merged.add(CustomBatchNormalization())
         merged.add(Activation('relu'))
+        merged.add(Dense(self.hid_dim))
+        merged.add(CustomBatchNormalization())
+        merged.add(Activation('relu'))
 
         z_mean = Sequential([merged])
-        z_mean.add(Dense(self.z_dim))
+        z_mean.add(Dense(self.hid_dim))
         z_mean.add(CustomBatchNormalization())
         z_mean.add(Activation('relu'))
+        z_mean.add(Dense(self.z_dim))
 
         z_var = Sequential([merged])
+        z_var.add(Dense(self.hid_dim))
+        z_var.add(CustomBatchNormalization())
+        z_var.add(Activation('relu'))
         z_var.add(Dense(self.z_dim))
         z_var.add(CustomBatchNormalization())
-        z_var.add(Activation('softmax'))
+        z_var.add(Activation('softplus'))
 
 
         return z_mean, z_var
@@ -93,13 +106,22 @@ class VAEM1M2(object):
         y_branch.add(Dense(self.hid_dim, input_dim=self.y_dim))
         y_branch.add(CustomBatchNormalization())
         y_branch.add(Activation('relu'))
+        y_branch.add(Dense(self.hid_dim))
+        y_branch.add(CustomBatchNormalization())
+        y_branch.add(Activation('relu'))
 
         z_branch = Sequential()
         z_branch.add(Dense(self.hid_dim, input_dim=self.z_dim))
         z_branch.add(CustomBatchNormalization())
         z_branch.add(Activation('relu'))
+        z_branch.add(Dense(self.hid_dim))
+        z_branch.add(CustomBatchNormalization())
+        z_branch.add(Activation('relu'))
 
         merged = Sequential([Merge([y_branch, z_branch], mode='concat')])
+        merged.add(Dense(self.hid_dim))
+        merged.add(CustomBatchNormalization())
+        merged.add(Activation('relu'))
         merged.add(Dense(self.hid_dim))
         merged.add(CustomBatchNormalization())
         merged.add(Activation('relu'))
@@ -117,7 +139,8 @@ class VAEM1M2(object):
         logliklihood = objectives.binary_crossentropy(x, x_reconstruct)
         KL = -1/2*K.mean(K.sum(1+K.log(self.var)-self.mean**2-self.var, axis=1))
         Eq_y_x = objectives.categorical_crossentropy(self.y, self.y_pred)
-        return KL-logliklihood+Eq_y_x*self.alpha
+        Ep_y =  K.log(1/self.y_dim)
+        return KL+logliklihood+Eq_y_x*self.alpha
 
 
 

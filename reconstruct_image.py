@@ -8,10 +8,13 @@ from sklearn.datasets import fetch_mldata
 from custom_batchnormalization import CustomBatchNormalization
 
 
+
 flags = tf.app.flags
 FLAGS = flags.FLAGS
 flags.DEFINE_boolean('rotation', True, 'use rotate dataset?')
 rotation = 'rot' if FLAGS.rotation else 'normal'
+
+y_dim = 11 if FLAGS.rotation else 10
 
 def get_data():
     if FLAGS.rotation:
@@ -35,21 +38,21 @@ if __name__ == '__main__':
 
     encoder = load_model("./trained_model/encoder_{}.h5".format(rotation), custom_objects={'CustomBatchNormalization': CustomBatchNormalization})
 
-    decoder = load_model("./trained_model/decoder_{}.h5".format(rotation))
+    decoder = load_model("./trained_model/decoder_{}.h5".format(rotation, custom_objects={'CustomBatchNormalization': CustomBatchNormalization}))
 
     images = X_data[0:5]
     labels = y_data[0:5]
 
-    latents = encoder.predict([images, labels], batch_size=5)
-    reconstruct_images = decoder.predict([labels, latents], batch_size=5)
+    latents = encoder.predict([images, labels], batch_size=1)
+    reconstruct_images = decoder.predict([labels, latents], batch_size=1)
 
     fig = plt.figure(figsize=(14, 14))
     for i, image in enumerate(images):
-        ax = fig.add_subplot(2, 5, i+1)
-        ax.imshow(image.reshape(28, 28))
+        ax = fig.add_subplot(2, 5, i+1, xticks=[], yticks=[])
+        ax.imshow(image.reshape(28, 28), 'gray')
     for i, reconstruct_image in enumerate(reconstruct_images):
-        ax = fig.add_subplot(2, 5, 6+i)
-        ax.imshow(reconstruct_image.reshape(28, 28))
+        ax = fig.add_subplot(2, 5, 6+i, xticks=[], yticks=[])
+        ax.imshow(reconstruct_image.reshape(28, 28), 'gray')
     plt.savefig("./images/reconstruct_image_{}.png".format(rotation))
 
 

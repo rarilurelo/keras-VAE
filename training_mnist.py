@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from keras.models import Model
 from keras.layers import Input
+from keras.callbacks import EarlyStopping, LearningRateScheduler
 import tensorflow as tf
 from vae_m1m2 import VAEM1M2
 import os.path
@@ -16,9 +17,10 @@ rotation = 'rot' if FLAGS.rotation else 'normal'
 print "start {}".format(rotation)
 
 y_dim = 11 if FLAGS.rotation else 10
-nb_epoch = 5
+nb_epoch = 20
 batch_size = 100
-alpha = 10
+alpha = 1
+learning_rate = 0.01
 
 def get_rotation():
     
@@ -63,6 +65,14 @@ def get_data():
         y_data = np.eye(np.max(y_data)+1)[y_data]
     return X_data, y_data
 
+def scheduler(epoch):
+    if epoch%5 == 0:
+        global learning_rate
+        learning_rate = learning_rate*0.1
+        return learning_rate
+    else:
+        return learning_rate
+
 
 if __name__ == '__main__':
     X_data, y_data = get_data()
@@ -70,14 +80,15 @@ if __name__ == '__main__':
 
     vaem1m2 = VAEM1M2(y_dim=y_dim, alpha=alpha)
     traininigModel = Model(input=[vaem1m2.x, vaem1m2.y], output=vaem1m2.x_reconstruct)
-    traininigModel.compile(optimizer='adam', loss=vaem1m2.loss_function)
+    traininigModel.compile(optimizer='rmsprop', loss=vaem1m2.loss_function)
 
 
     traininigModel.fit([X_train, y_train], X_train,
                         shuffle=True,
                         nb_epoch=nb_epoch,
                         batch_size=batch_size,
-                        validation_data=([X_test, y_test], X_test))
+                        validation_data=([X_test, y_test], X_test),
+                        callbacks=[EarlyStopping(patience=3), LearningRateScheduler(scheduler)])
 
     # encode to mean deterministic
     encoder = Model(input=[vaem1m2.x, vaem1m2.y], output=vaem1m2.mean)
