@@ -3,7 +3,7 @@ from keras import initializations
 from keras import backend as K
 
 
-class BatchNormalization(Layer):
+class CustomBatchNormalization(Layer):
     '''Normalize the activations of the previous layer at each batch,
     i.e. applies a transformation that maintains the mean activation
     close to 0 and the activation standard deviation close to 1.
@@ -68,7 +68,7 @@ class BatchNormalization(Layer):
         self.initial_weights = weights
         if self.mode == 0:
             self.uses_learning_phase = True
-        super(BatchNormalization, self).__init__(**kwargs)
+        super(CustomBatchNormalization, self).__init__(**kwargs)
 
     def build(self, input_shape):
         self.input_spec = [InputSpec(shape=input_shape)]
@@ -156,6 +156,6 @@ class BatchNormalization(Layer):
                   "mode": self.mode,
                   "axis": self.axis,
                   "momentum": self.momentum}
-        base_config = super(BatchNormalization, self).get_config()
+        base_config = super(CustomBatchNormalization, self).get_config()
         return dict(list(base_config.items()) + list(config.items()))
 
