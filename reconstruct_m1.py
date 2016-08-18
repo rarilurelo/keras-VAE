@@ -18,13 +18,13 @@ if __name__ == '__main__':
     encoder = load_model('./trained_model/encoder_m1.h5', custom_objects={'CustomBatchNormalization': CustomBatchNormalization})
     decoder = load_model('./trained_model/decoder_m1.h5', custom_objects={'CustomBatchNormalization': CustomBatchNormalization})
 
-    target = X_train[0:5]
+    targets = X_train[0:5]
 
-    latent = encoder.predict(target, batch_size=5)
-    reconstruct_image = decoder.predict(latent, batch_size=5)
+    latents = encoder.predict(targets, batch_size=5)
+    reconstruct_images = decoder.predict(latents, batch_size=5)
 
     fig = plt.figure(figsize=(14, 14))
-    for i, image in enumerate(images):
+    for i, target in enumerate(targets):
         ax = fig.add_subplot(2, 5, i+1, xticks=[], yticks=[])
         ax.imshow(target.reshape(28, 28), 'gray')
     for i, reconstruct_image in enumerate(reconstruct_images):

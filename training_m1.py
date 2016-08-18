@@ -2,7 +2,7 @@ from __future__ import division
 from keras.datasets import mnist
 from vae_m1 import VAEM1
 
-nb_epoch = 10
+nb_epoch = 30
 
 
 if __name__ == '__main__':
