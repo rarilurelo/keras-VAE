@@ -2,7 +2,7 @@
 from __future__ import division
 from keras.models import Sequential
 from keras.layers import Dense, Activation, Merge, Input
-from custom_batchnormalization import CustomBatchNormalization
+from probability_distribution import GaussianDistribution, BernoulliDistribution
 from keras import backend as K
 from keras import objectives
 
