@@ -1,13 +1,14 @@
 from __future__ import division
 from keras.datasets import mnist
 from keras.models import load_model
+from keras.callbacks import EarlyStopping
 from vae_m1 import VAEM1
 from vae_m2 import VAEM2
 from custom_batchnormalization import CustomBatchNormalization
 import numpy as np
 import os
 
-nb_epoch = 1
+nb_epoch = 30
 custom_objects = {'CustomBatchNormalization': CustomBatchNormalization}
 
 
@@ -42,8 +43,8 @@ if __name__ == '__main__':
         decoder_m1 = vaem1.decoder()
         decoder_m1.save('./trained_model/decoder_m1.h5')
 
-    z1_train = encoder_m1.predict(X_train, batch_size=100, verbose=1)
-    z1_test = encoder_m1.predict(X_test, batch_size=100, verbose=1)
+    z1_train = encoder_m1.predict(X_train, batch_size=100)
+    z1_test = encoder_m1.predict(X_test, batch_size=100)
 
     #####################
     # only labeled data #
@@ -56,6 +57,7 @@ if __name__ == '__main__':
                        batch_size=100,
                        nb_epoch=nb_epoch,
                        validation_data=([z1_test, y_test], z1_test),
+                       callbacks=[EarlyStopping(patience=3)],
                        shuffle=True)
 
     ##############################
