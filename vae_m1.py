@@ -3,7 +3,6 @@ from keras.layers import Input, Dense, Activation
 from keras.models import Model, Sequential
 import keras.backend as K
 from probability_distributions import GaussianDistribution, BernoulliDistribution
-from custom_batchnormalization import CustomBatchNormalization
 
 
 class VAEM1(object):
@@ -19,31 +18,25 @@ class VAEM1(object):
         #####################
         model = Sequential()
         model.add(Dense(self.hid_dim, input_dim=self.in_dim))
-        model.add(CustomBatchNormalization())
-        model.add(Activation('relu'))
+        model.add(Activation('softplus'))
         model.add(Dense(self.hid_dim))
-        model.add(CustomBatchNormalization())
-        model.add(Activation('relu'))
+        model.add(Activation('softplus'))
         mean = Sequential([model])
         mean.add(Dense(self.hid_dim))
-        mean.add(CustomBatchNormalization())
-        mean.add(Activation('relu'))
-        mean.add(Dense(self.z_dim, activation='relu'))
+        mean.add(Activation('softplus'))
+        mean.add(Dense(self.z_dim, activation='softplus'))
         var = Sequential([model])
         var.add(Dense(self.hid_dim))
-        var.add(CustomBatchNormalization())
-        var.add(Activation('relu'))
-        var.add(Dense(self.z_dim, activation='sigmoid'))
+        var.add(Activation('softplus'))
+        var.add(Dense(self.z_dim, activation='softplus'))
         self.q_z_x = GaussianDistribution(self.z, givens=[self.x], mean_model=mean, var_model=var)
 
         model = Sequential()
         model.add(Dense(self.hid_dim, input_dim=self.z_dim))
-        model.add(CustomBatchNormalization())
-        model.add(Activation('relu'))
+        model.add(Activation('softplus'))
         model.add(Dense(self.hid_dim))
-        model.add(CustomBatchNormalization())
-        model.add(Activation('relu'))
-        model.add(Dense(self.in_dim, activation='sigmoid'))
+        model.add(Activation('softplus'))
+        model.add(Dense(self.in_dim, activation='softplus'))
         self.p_x_z = BernoulliDistribution(self.x, givens=[self.z], model=model)
 
         ########################

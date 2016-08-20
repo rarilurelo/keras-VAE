@@ -1,8 +1,8 @@
 from keras.models import load_model
 from keras.datasets import mnist
 import matplotlib.pyplot as plt
-from custom_batchnormalization import CustomBatchNormalization
 
+custom_objects={}
 
 if __name__ == '__main__':
     (X_train, y_train), (X_test, y_test) = mnist.load_data()
@@ -15,8 +15,8 @@ if __name__ == '__main__':
     X_test[X_test > 0.5] = 1.0
     X_test[X_test <= 0.5] = 0.0
 
-    encoder = load_model('./trained_model/encoder_m1.h5', custom_objects={'CustomBatchNormalization': CustomBatchNormalization})
-    decoder = load_model('./trained_model/decoder_m1.h5', custom_objects={'CustomBatchNormalization': CustomBatchNormalization})
+    encoder = load_model('./trained_model/encoder_m1.h5', custom_objects=custom_objects)
+    decoder = load_model('./trained_model/decoder_m1.h5', custom_objects=custom_objects)
 
     targets = X_train[0:5]
 

@@ -4,12 +4,11 @@ from keras.models import load_model
 from keras.callbacks import EarlyStopping
 from vae_m1 import VAEM1
 from vae_m2 import VAEM2
-from custom_batchnormalization import CustomBatchNormalization
 import numpy as np
 import os
 
 nb_epoch = 30
-custom_objects = {'CustomBatchNormalization': CustomBatchNormalization}
+custom_objects = {}
 
 
 if __name__ == '__main__':
