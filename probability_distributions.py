@@ -2,7 +2,6 @@ from __future__ import division
 import keras.backend as K
 from keras.models import Sequential
 from keras.layers import Dense, Lambda, Merge
-
 import numpy as np
 
 class ProbabilityDistribution(object):
@@ -164,7 +163,7 @@ class CategoricalDistribution(ProbabilityDistribution):
     def sampling(self, givens=None):
         if givens is None:
             return self.draw(self.pi)
-        pi = self.model(self.merge(givens))
+        pi = self.model(givens)
         return self.draw(pi)
 
     def _help_prob(self, variable, pi):
@@ -173,7 +172,7 @@ class CategoricalDistribution(ProbabilityDistribution):
     def prob(self, variable, givens=None):
         if givens is None:
             return self._help_prob(variable, self.pi)
-        pi = self.model(self.merge(givens))
+        pi = self.model(givens)
         return self._help_prob(variable, pi)
 
     def _help_logliklihood(self, variable, pi):
@@ -182,7 +181,7 @@ class CategoricalDistribution(ProbabilityDistribution):
     def logliklihood(self, variable, givens=None):
         if givens is None:
             return self._help_logliklihood(variable, self.pi)
-        pi = self.model(self.merge(givens))
+        pi = self.model(givens)
         return self._help_logliklihood(variable, pi)
 
 
