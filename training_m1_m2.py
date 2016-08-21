@@ -35,7 +35,8 @@ if __name__ == '__main__':
                      batch_size=100,
                      nb_epoch=nb_epoch,
                      shuffle=True,
-                     validation_data=(X_test, X_test)
+                     validation_data=(X_test, X_test),
+                     callbacks=[EarlyStopping(patience=3)]
                      )
         encoder_m1 = vaem1.encoder()
         encoder_m1.save('./trained_model/encoder_m1.h5')

@@ -61,7 +61,8 @@ class VAEM1(object):
         return model
 
     def encoder(self):
-        model = Model(input=self.x, output=self.mean)
+        mean, var = self.q_z_x.get_params(givens=[self.x])
+        model = Model(input=self.x, output=mean)
         return model
 
     def decoder(self):
