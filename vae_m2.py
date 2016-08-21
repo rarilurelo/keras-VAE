@@ -127,8 +127,8 @@ class VAEM2(object):
         self.mean, self.var = self.q_z_xy.get_params(givens=[self.x_l, self.y_l])
         KL = self._KL(self.mean, self.var)
         logliklihood = -self.p_x_yz.logliklihood(self.x_l, givens=[self.y_l, self.sampling_z])-self.p_y.logliklihood(self.y_l)
-        L = self.KL+self.logliklihood
-        L = self.L+self.alpha*self.q_y_x.logliklihood(self.y_l, givens=[self.x_l])
+        L = KL+logliklihood
+        L = L+self.alpha*self.q_y_x.logliklihood(self.y_l, givens=[self.x_l])
 
         #############
         # UnLabeled #
@@ -138,7 +138,7 @@ class VAEM2(object):
         for y in self.y_u:
             mean, var = self.q_z_xy.get_params(givens=[self.x_u, y])
             sampling_z = self.q_z_xy.sampling(givens=[self.x_u, y])
-            U += self.q_y_x.prob(y, givens=[x])*(-self.p_x_yz.logliklihood(self.x_u, givens=[y, sampling_z])
+            U += self.q_y_x.prob(y, givens=[self.x_u])*(-self.p_x_yz.logliklihood(self.x_u, givens=[y, sampling_z])
                                                    -self.p_y.logliklihood(y)
                                                    +self._KL(mean, var)
                                                    +self.q_y_x.logliklihood(y, givens=[self.x_u])
