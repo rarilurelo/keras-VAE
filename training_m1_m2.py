@@ -6,9 +6,10 @@ from vae_m1 import VAEM1
 from vae_m2 import VAEM2
 import numpy as np
 import os
+from custom_batchnormalization import CustomBatchNormalization
 
-nb_epoch = 100
-custom_objects = {}
+nb_epoch = 200
+custom_objects = {'CustomBatchNormalization': CustomBatchNormalization}
 
 
 if __name__ == '__main__':
@@ -24,24 +25,20 @@ if __name__ == '__main__':
     X_test[X_test > 0.5] = 1.0
     X_test[X_test <= 0.5] = 0.0
 
-    if os.path.exists('./trained_model/encoder_m1.h5') and os.path.exists('./trained_model/decoder_m1.h5'):
-        encoder_m1 = load_model('./trained_model/encoder_m1.h5', custom_objects=custom_objects)
-        decoder_m1 = load_model('./trained_model/decoder_m1.h5', custom_objects=custom_objects)
-    else:
-        vaem1 = VAEM1()
-        training = vaem1.training_model()
-        training.compile(optimizer='adam', loss=vaem1.cost)
-        training.fit(X_train, X_train,
-                     batch_size=100,
-                     nb_epoch=nb_epoch,
-                     shuffle=True,
-                     validation_data=(X_test, X_test),
-                     callbacks=[EarlyStopping(patience=5)]
-                     )
-        encoder_m1 = vaem1.encoder()
-        encoder_m1.save('./trained_model/encoder_m1.h5')
-        decoder_m1 = vaem1.decoder()
-        decoder_m1.save('./trained_model/decoder_m1.h5')
+    vaem1 = VAEM1()
+    training = vaem1.training_model()
+    training.compile(optimizer='adam', loss=vaem1.cost)
+    training.fit(X_train, X_train,
+                 batch_size=100,
+                 nb_epoch=nb_epoch,
+                 shuffle=True,
+                 validation_data=(X_test, X_test),
+                 callbacks=[EarlyStopping(patience=10)]
+                 )
+    encoder_m1 = vaem1.encoder()
+    encoder_m1.save('./trained_model/encoder_m1.h5')
+    decoder_m1 = vaem1.decoder()
+    decoder_m1.save('./trained_model/decoder_m1.h5')
 
     z1_train = encoder_m1.predict(X_train, batch_size=100)
     z1_test = encoder_m1.predict(X_test, batch_size=100)
@@ -57,7 +54,7 @@ if __name__ == '__main__':
                        batch_size=100,
                        nb_epoch=nb_epoch,
                        validation_data=([z1_test, y_test], z1_test),
-                       callbacks=[EarlyStopping(patience=5)],
+                       callbacks=[EarlyStopping(patience=10)],
                        shuffle=True)
 
     ##############################

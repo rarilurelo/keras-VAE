@@ -1,8 +1,9 @@
 from keras.models import load_model
 from keras.datasets import mnist
 import matplotlib.pyplot as plt
+from custom_batchnormalization import CustomBatchNormalization
 
-custom_objects={}
+custom_objects={'CustomBatchNormalization': CustomBatchNormalization}
 
 if __name__ == '__main__':
     (X_train, y_train), (X_test, y_test) = mnist.load_data()
