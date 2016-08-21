@@ -94,7 +94,7 @@ class VAEM2(object):
         self.reconstruct_x_l = self.p_x_yz.sampling(givens=[self.y_l, self.sampling_z])
 
     def _KL(self, mean, var):
-        return -1/2*K.mean(K.sum(1+K.log(K.clip(var, K._epsilon, 1/K._epsilon)-mean**2-var, axis=1))
+        return -1/2*K.mean(K.sum(1+K.log(K.clip(var, K._epsilon, 1/K._epsilon))-mean**2-var, axis=1))
 
     def label_cost(self, y_true, y_false):
         ###########
