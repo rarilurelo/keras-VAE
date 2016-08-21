@@ -28,7 +28,7 @@ class VAEM1(object):
         mean.add(Dense(self.hid_dim))
         mean.add(CustomBatchNormalization())
         mean.add(Activation('softplus'))
-        mean.add(Dense(self.z_dim, activation='softplus'))
+        mean.add(Dense(self.z_dim))
         var = Sequential([model])
         var.add(Dense(self.hid_dim))
         var.add(CustomBatchNormalization())
@@ -71,8 +71,7 @@ class VAEM1(object):
         return model
 
     def encoder(self):
-        mean, var = self.q_z_x.get_params(givens=[self.x])
-        model = Model(input=self.x, output=mean)
+        model = Model(input=self.x, output=self.sampling_z)
         return model
 
     def decoder(self):

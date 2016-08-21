@@ -2,6 +2,7 @@ from __future__ import division
 from keras.datasets import mnist
 from keras.models import load_model
 from keras.callbacks import EarlyStopping
+from keras.optimizers import RMSprop
 from vae_m1 import VAEM1
 from vae_m2 import VAEM2
 import numpy as np
@@ -27,7 +28,8 @@ if __name__ == '__main__':
 
     vaem1 = VAEM1()
     training = vaem1.training_model()
-    training.compile(optimizer='adam', loss=vaem1.cost)
+    rmsprop = RMSprop()
+    training.compile(optimizer=rmsprop, loss=vaem1.cost)
     training.fit(X_train, X_train,
                  batch_size=100,
                  nb_epoch=nb_epoch,
@@ -48,7 +50,7 @@ if __name__ == '__main__':
     #####################
     vaem2 = VAEM2()
     label_training = vaem2.label_training_model()
-    label_training.compile(optimizer='adam', loss=vaem2.label_cost)
+    label_training.compile(optimizer=rmsprop, loss=vaem2.label_cost)
     label_training.fit([z1_train, y_train],
                        z1_train,
                        batch_size=100,
