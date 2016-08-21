@@ -36,7 +36,7 @@ class VAEM1(object):
         model.add(Activation('softplus'))
         model.add(Dense(self.hid_dim))
         model.add(Activation('softplus'))
-        model.add(Dense(self.in_dim, activation='softplus'))
+        model.add(Dense(self.in_dim, activation='sigmoid'))
         self.p_x_z = BernoulliDistribution(self.x, givens=[self.z], model=model)
 
         ########################
@@ -46,7 +46,7 @@ class VAEM1(object):
         self.reconstruct_x = self.p_x_z.sampling(givens=[self.sampling_z])
 
     def _KL(self, mean, var):
-        return -1/2*K.mean(K.sum(1+K.log(var)-mean**2-var, axis=1))
+        return -1/2*K.mean(K.sum(1+K.log(K.clip(var, K._epsilon, 1/K._epsilon))-mean**2-var, axis=1))
 
     def cost(self, inputs, outputs):
         mean, var = self.q_z_x.get_params(givens=[self.x])

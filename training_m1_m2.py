@@ -7,7 +7,7 @@ from vae_m2 import VAEM2
 import numpy as np
 import os
 
-nb_epoch = 30
+nb_epoch = 100
 custom_objects = {}
 
 
@@ -36,7 +36,7 @@ if __name__ == '__main__':
                      nb_epoch=nb_epoch,
                      shuffle=True,
                      validation_data=(X_test, X_test),
-                     callbacks=[EarlyStopping(patience=3)]
+                     callbacks=[EarlyStopping(patience=5)]
                      )
         encoder_m1 = vaem1.encoder()
         encoder_m1.save('./trained_model/encoder_m1.h5')
@@ -57,7 +57,7 @@ if __name__ == '__main__':
                        batch_size=100,
                        nb_epoch=nb_epoch,
                        validation_data=([z1_test, y_test], z1_test),
-                       callbacks=[EarlyStopping(patience=3)],
+                       callbacks=[EarlyStopping(patience=5)],
                        shuffle=True)
 
     ##############################

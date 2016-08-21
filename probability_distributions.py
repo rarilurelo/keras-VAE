@@ -66,7 +66,7 @@ class GaussianDistribution(ProbabilityDistribution):
         return 1/K.sqrt(2*np.pi*var)*K.exp(-1/2*(variable-mean)**2/var)
 
     def _log_gausian(self, variable, mean, var):
-        return -1/2*K.log(K.clip(2*np.pi*var, K._epsilon, 1/K._epsilon))-1/2*(variable-mean)**2/var
+        return -1/2*K.log(K.clip(2*np.pi*var, K._epsilon, 1/K._epsilon))-1/2*(variable-mean)**2/K.clip(var, K._epsilon, 1/K._epsilon)
 
     def logliklihood(self, variable, givens=None):
         """
